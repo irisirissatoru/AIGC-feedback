@@ -25,9 +25,9 @@ def get_feedback(prompt: str, score: float) -> str:
     user_msg = f'''
 Prompt: {prompt}
 Score: {score}/10
-
+ 
 Please:
-1. Briefly comment on the image quality based on its score;
+1. Briefly comment on the image quality based on its score, like you can see this image, do not use ambiguous words;
 2. Analyze any shortcomings of the prompt;
 3. Suggest an improved version of the prompt.
 '''
