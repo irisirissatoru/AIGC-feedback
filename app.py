@@ -21,15 +21,18 @@ client = OpenAI(
 )
 
 def get_feedback(prompt: str, score: float) -> str:
-    system_msg = "You are an expert in prompt engineering and image generation. Help improve prompts for Stable Diffusion."
+    system_msg = "You are a professional image prompt critic and must provide clear, confident feedback without hedging language."
     user_msg = f'''
 Prompt: {prompt}
 Score: {score}/10
  
-Please:
-1. Briefly comment on the image quality based on its score, like you can see this image, do not use ambiguous words;
-2. Analyze any shortcomings of the prompt;
-3. Suggest an improved version of the prompt.
+Please do the following in English:
+
+1. **Directly describe** what the image looks like (no phrases like "might show", "may be", etc.)
+2. **Critically analyze** flaws in visual quality or how the prompt affected them — be specific
+3. **Propose a clearly better prompt** to improve visual fidelity and detail
+
+Avoid hedging expressions like "may", "might", "could", or "possibly". Be confident and specific.
 '''
 
     try:
