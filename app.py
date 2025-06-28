@@ -5,9 +5,7 @@ from PIL import Image
 import io
 import random
 import requests
-
-# GPT API key from secrets
-openai.api_key = st.secrets.get("OPENAI_API_KEY", "sk-...")
+from openai import OpenAI
 
 # Simulated scoring function
 def score_image(image: Image.Image) -> float:
@@ -15,7 +13,10 @@ def score_image(image: Image.Image) -> float:
     st.info(f"authentic score: {score}")
     return score
 
-# GPT feedback function
+
+# 初始化新版 OpenAI 客户端
+client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
+
 def get_feedback(prompt: str, score: float) -> str:
     system_msg = "You are an expert in prompt engineering and image generation. Help improve prompts for Stable Diffusion."
     user_msg = f'''
@@ -27,17 +28,19 @@ Please:
 2. Analyze any shortcomings of the prompt;
 3. Suggest an improved version of the prompt.
 '''
+
     try:
-        response = openai.ChatCompletion.create(
+        response = client.chat.completions.create(
             model="gpt-4",
             messages=[
                 {"role": "system", "content": system_msg},
                 {"role": "user", "content": user_msg}
             ]
         )
-        return response["choices"][0]["message"]["content"]
+        return response.choices[0].message.content
     except Exception as e:
         return f"Error from GPT: {e}"
+
 
 # Streamlit UI
 st.title("🎨Gen-image Scorer")
