@@ -6,6 +6,7 @@ import io
 import random
 import requests
 from openai import OpenAI
+import os
 
 # Simulated scoring function
 def score_image(image: Image.Image) -> float:
@@ -13,9 +14,11 @@ def score_image(image: Image.Image) -> float:
     st.info(f"authentic score: {score}")
     return score
 
-
-# 初始化新版 OpenAI 客户端
-client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
+# qwen
+client = OpenAI(
+    api_key=st.secrets["DASHSCOPE_API_KEY"],  # 从 Streamlit secrets.toml 读取
+    base_url="https://dashscope.aliyuncs.com/compatible-mode/v1"
+)
 
 def get_feedback(prompt: str, score: float) -> str:
     system_msg = "You are an expert in prompt engineering and image generation. Help improve prompts for Stable Diffusion."
@@ -24,22 +27,24 @@ Prompt: {prompt}
 Score: {score}/10
 
 Please:
-1. Briefly comment on the image quality;
+1. Briefly comment on the image quality based on its score;
 2. Analyze any shortcomings of the prompt;
 3. Suggest an improved version of the prompt.
 '''
 
     try:
         response = client.chat.completions.create(
-            model="gpt-4",
+            model="qwen-plus",
             messages=[
                 {"role": "system", "content": system_msg},
-                {"role": "user", "content": user_msg}
-            ]
+                {"role": "user", "content": user_msg},
+            ],
+            # 需要时可加这行避免报错（看你是否使用 Qwen3）
+            # extra_body={"enable_thinking": False}
         )
         return response.choices[0].message.content
     except Exception as e:
-        return f"Error from GPT: {e}"
+        return f"Error from Qwen API: {e}"
 
 
 # Streamlit UI
@@ -53,7 +58,7 @@ if st.button("Evaluate") and prompt and uploaded_file:
     score = score_image(image)
     feedback = get_feedback(prompt, score)
 
-    st.image(image, caption=f"Image Score: {score}/10", use_column_width=True)
+    st.image(image, caption=f"Image Score: {score}/10", use_container_width=True)
     st.markdown("### 📝 GPT Feedback and Prompt Suggestions")
     st.write(feedback)
 else:
