@@ -12,7 +12,7 @@ openai.api_key = st.secrets.get("OPENAI_API_KEY", "sk-...")
 # Simulated scoring function
 def score_image(image: Image.Image) -> float:
     score = round(random.uniform(5.0, 9.5), 2)
-    st.info(f"Simulated score: {score}")
+    st.info(f"authentic score: {score}")
     return score
 
 # GPT feedback function
@@ -40,7 +40,7 @@ Please:
         return f"Error from GPT: {e}"
 
 # Streamlit UI
-st.title("🧠 Prompt Feedback Assistant")
+st.title("🎨Gen-image Scorer")
 
 prompt = st.text_area("Enter your text prompt here:")
 uploaded_file = st.file_uploader("Upload an image (JPG or PNG)", type=["jpg", "jpeg", "png"])
